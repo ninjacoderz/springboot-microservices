@@ -41,7 +41,7 @@ public class OrderService {
         // Call Inventory Service to check the availability of the products
         List<String> skuCodes = order.getOrderLineItemsList().stream().map(orderLineItem -> orderLineItem.getSkuCode()).toList();
         InventoryResponse[] inventoryResponseArray = webClientBuilder.build().get()
-            .uri("http://localhost:8082/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes)
+            .uri("http://inventory-service/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes)
             .build())
             .retrieve()
             .bodyToMono(InventoryResponse[].class)
