@@ -24,7 +24,7 @@ public class OrderService {
     final private OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
 
-    public void placeOrder(OrderRequest orderRequest) {
+    public String placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());  
         List<OrderLineItems> orderLineItems =  orderRequest.getOrderLineItemsDtoList().stream().map(orderLineItemsDto -> {
@@ -40,7 +40,7 @@ public class OrderService {
         // Call Inventory Service to check the availability of the products
         List<String> skuCodes = order.getOrderLineItemsList().stream().map(orderLineItem -> orderLineItem.getSkuCode()).toList();
         InventoryResponse[] inventoryResponseArray = webClientBuilder.build().get()
-            .uri("http://inventory-service/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes)
+            .uri("lb://inventory-service/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes)
             .build())
             .retrieve()
             .bodyToMono(InventoryResponse[].class)
@@ -49,6 +49,7 @@ public class OrderService {
         boolean result = Arrays.stream(inventoryResponseArray).allMatch(inventoryResponse -> inventoryResponse.getIsInStock());
         if(result) {
             orderRepository.save(order);
+            return "Order placed successfully";
         } else {
             throw new IllegalArgumentException("Product is not available");
         }
