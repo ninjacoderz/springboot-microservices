@@ -30,12 +30,12 @@ public class OrderController {
     @TimeLimiter(name = "inventory")
     @Retry(name = "inventory")
     public CompletableFuture<String> placeOrder(@RequestBody OrderRequest orderRequest) {
-        log.info("Placing Order");
+        log.info("Placing Order{}", orderRequest);
         return CompletableFuture.supplyAsync(() -> orderService.placeOrder(orderRequest)) ;
     }
 
     public CompletableFuture<String> fallbackMethod( OrderRequest orderRequest, RuntimeException exception){
-        log.info("Cannot Place Order Executing Fallback logic");
+        log.info("Cannot Place Order Executing Fallback logic {}", orderRequest);
         return CompletableFuture.supplyAsync(() -> "Oops, Something went wrong, please take order again sometimes!");
     }
 }

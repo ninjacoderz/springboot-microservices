@@ -30,7 +30,7 @@ public class InventoryService {
         //     e.printStackTrace();
         // }
         // log.info(" Wait End");
-        
+
         return inventoryRepository.findBySkuCodeIn(skuCode).stream()
         .map(inventory -> InventoryResponse.builder()
             .skuCode(inventory.getSkuCode())
